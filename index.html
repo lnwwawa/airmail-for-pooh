@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Airmail for Pooh</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;700&display=swap">
+<style>
+@font-face{font-family:"JaoHalloween";src:url("fonts/JaoHalloween-Bold.ttf") format("truetype");font-weight:100 900;font-style:normal;font-display:swap;unicode-range:U+0000-002B,U+002D-10FFFF}
+/* Layout: one narrow letter-width column, like stationery laid on a desk. Airmail world: envelope, stamp, postmark, wax seal. */
+:root{
+  --paper:#EAF0F8; --sheet:#FBFCFE; --ink:#26345F; --ink-soft:#5A6890;
+  --blush:#E8A0B4; --blush-deep:#B4566F; --butter:#F3E3A4; --line:#C9D4E6;
+  --shadow:rgba(38,52,95,.14);
+  --serif:"JaoHalloween","Mali", "Chalkboard SE", "Comic Sans MS", cursive;
+  --hand:"JaoHalloween","Mali", "Chalkboard SE", "Comic Sans MS", cursive;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#151C33; --sheet:#1F2846; --ink:#E7ECF7; --ink-soft:#A5B0CE;
+  --blush:#E8A0B4; --blush-deep:#F0A9BC; --butter:#E6D48C; --line:#34406A;
+  --shadow:rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#151C33; --sheet:#1F2846; --ink:#E7ECF7; --ink-soft:#A5B0CE;
+  --blush:#E8A0B4; --blush-deep:#F0A9BC; --butter:#E6D48C; --line:#34406A;
+  --shadow:rgba(0,0,0,.35); color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:18px;line-height:1.7;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 64px}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:72px}
+h2{font-weight:700;font-size:1.6rem;line-height:1.55;margin:0;text-wrap:balance}
+p{margin:0}
+.lede{color:var(--ink-soft);margin-top:6px}
+button{font:inherit;color:inherit;cursor:pointer;text-transform:inherit}
+:focus-visible{outline:3px solid var(--blush-deep);outline-offset:3px;border-radius:6px}
+
+/* ---------- Envelope ---------- */
+.mail{display:flex;flex-direction:column;gap:20px;align-items:center}
+.envelope{position:relative;width:100%;max-width:100%;aspect-ratio:3/2;perspective:900px}
+.env-back{position:absolute;inset:0;border-radius:6px;background:var(--sheet);
+  box-shadow:0 18px 40px -18px var(--shadow);overflow:hidden}
+.env-back::before{content:"";position:absolute;inset:0;border:9px solid transparent;border-radius:6px;
+  background:repeating-linear-gradient(-45deg,var(--blush) 0 14px,transparent 14px 22px,#6F8DD1 22px 36px,transparent 36px 44px) border-box;
+  -webkit-mask:linear-gradient(#000 0 0) padding-box exclude,linear-gradient(#000 0 0);
+          mask:linear-gradient(#000 0 0) padding-box exclude,linear-gradient(#000 0 0)}
+.flap{position:absolute;left:0;right:0;top:0;height:58%;transform-origin:top center;
+  transition:transform .7s cubic-bezier(.5,0,.3,1);z-index:3;filter:drop-shadow(0 4px 4px var(--shadow))}
+.flap svg{width:100%;height:100%;display:block;overflow:visible}
+/* crayon look */
+.env-back{filter:url(#crayon)}
+.env-lines{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;overflow:visible}
+.crayon-line{fill:none;stroke:var(--ink-soft);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.envelope.open .flap{transform:rotateX(180deg)}
+.address{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);z-index:1;line-height:1.15;text-align:center;white-space:nowrap}
+.address .to{font-family:var(--hand);font-weight:700;font-size:clamp(1.4rem,5vw,1.9rem);color:var(--ink)}
+.address .from{font-size:.75rem;color:var(--ink-soft)}
+.stamp{position:absolute;right:7%;top:12%;z-index:4;width:15%;aspect-ratio:4/5;background:var(--butter);padding:5%;
+  -webkit-mask:radial-gradient(circle at 4px 4px,transparent 2.5px,#000 3px) -4px -4px/8px 8px;
+  mask:radial-gradient(circle at 4px 4px,transparent 2.5px,#000 3px) -4px -4px/8px 8px;transform:rotate(4deg)}
+.stamp svg{width:100%;height:100%;display:block}
+.postmark{position:absolute;right:16%;top:20%;z-index:5;width:24%;aspect-ratio:1;opacity:.55;pointer-events:none}
+.envelope.open .stamp,.envelope.open .postmark{opacity:0;transition:opacity .3s}
+.seal{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);z-index:6;width:64px;height:64px;border:0;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#F6C6D3,var(--blush) 55%,#D17C95);color:#7A2E44;
+  font-family:var(--hand);font-weight:700;font-size:1.6rem;line-height:1;display:grid;place-items:center;
+  box-shadow:0 3px 0 #C06C86,0 8px 16px -4px var(--shadow);transition:transform .2s}
+.seal:hover{transform:translate(-50%,-50%) scale(1.06)}
+.envelope.open .seal{transform:translate(-50%,-50%) scale(0);transition:transform .25s}
+.hint{color:var(--ink-soft);font-size:.95rem}
+
+/* ---------- Letter ---------- */
+.letter{position:relative;isolation:isolate;border-radius:6px;padding:36px 30px 40px;box-shadow:0 20px 50px -24px var(--shadow);
+  font-family:var(--hand);font-size:1.2rem;font-weight:500;line-height:44px;transform-origin:top center}
+.letter::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:6px;border:3px solid var(--ink-soft);
+  background-color:var(--sheet);background-image:repeating-linear-gradient(transparent 0 42px,var(--line) 42px 44px);background-position:0 22px;
+  filter:url(#crayon)}
+.letter p+p{margin-top:44px}
+.letter .sign{text-align:right;margin-top:44px}
+.letter.reveal{animation:unfold .8s cubic-bezier(.2,.7,.2,1) both}
+.letter.fold{animation:fold .6s cubic-bezier(.6,0,.8,.3) both}
+@keyframes fold{to{transform:translateY(-60px) scaleY(.1);opacity:0}}
+.envelope.open{cursor:pointer}
+@keyframes unfold{from{transform:translateY(-40px) scaleY(.4);opacity:0}to{transform:none;opacity:1}}
+
+/* ---------- Jar ---------- */
+.section-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;margin-bottom:24px}
+.jar-area{display:grid;grid-template-columns:minmax(0,180px) minmax(0,1fr);gap:28px;align-items:center}
+.jar{width:100%;max-width:100%;border:0;background:none;padding:0}
+.jar svg{width:100%;display:block}
+.jar:hover .lid{transform:translateY(-4px)}
+.lid{transition:transform .25s}
+.slip-zone{min-width:0;display:flex;flex-direction:column;gap:14px}
+.slip{background:var(--butter);color:#3A3418;padding:18px 20px;border-radius:2px;font-family:var(--hand);font-weight:500;font-size:1.15rem;line-height:2.1;letter-spacing:.03em;padding-block:22px;
+  box-shadow:0 10px 20px -12px var(--shadow);transform:rotate(-1.5deg);min-height:5.5em;display:flex;align-items:center}
+.slip.pop{animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{from{transform:translateY(30px) rotate(6deg) scale(.8);opacity:0}}
+.slip.empty{background:transparent;border:2px dashed var(--line);color:var(--ink-soft);transform:none}
+.count{font-size:.9rem;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.btn{align-self:flex-start;border:1.5px solid var(--ink);background:transparent;border-radius:999px;padding:8px 20px;font-size:.95rem;font-weight:700}
+.btn:hover{background:var(--ink);color:var(--paper)}
+
+/* ---------- Open when ---------- */
+.envs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.mini{position:relative;border:1.5px solid var(--line);background:var(--sheet);border-radius:4px;padding:44px 14px 16px;text-align:left;
+  min-height:110px;overflow:hidden}
+.mini::before{content:"";position:absolute;left:-1px;right:-1px;top:-1px;height:38px;background:var(--line);clip-path:polygon(0 0,100% 0,50% 100%);transition:transform .35s;transform-origin:top}
+.mini[aria-expanded="true"]::before{transform:scaleY(-1);opacity:.4}
+.mini .when{font-size:.95rem;line-height:1.6;display:block}
+.mini .when b{display:block;font-size:.8rem;font-weight:400;color:var(--ink-soft)}
+.mini .inside{display:block;font-family:var(--hand);font-weight:500;font-size:1.02rem;line-height:1.65;margin-top:10px;color:var(--blush-deep)}
+.mini[aria-expanded="true"]{border-color:var(--blush)}
+
+/* ---------- Coupons ---------- */
+.coupons{display:flex;flex-direction:column;gap:14px}
+.coupon{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:16px;padding:16px 18px;background:var(--sheet);
+  border-radius:8px;position:relative;
+  -webkit-mask:radial-gradient(circle at 0 50%,transparent 9px,#000 9.5px) left/51% 100% no-repeat,radial-gradient(circle at 100% 50%,transparent 9px,#000 9.5px) right/51% 100% no-repeat;
+          mask:radial-gradient(circle at 0 50%,transparent 9px,#000 9.5px) left/51% 100% no-repeat,radial-gradient(circle at 100% 50%,transparent 9px,#000 9.5px) right/51% 100% no-repeat}
+.coupon h3{margin:0;font-size:1.05rem;line-height:1.6}
+.coupon p{font-size:.88rem;color:var(--ink-soft);line-height:1.6}
+.coupon .redeem{border:0;border-left:2px dashed var(--line);background:none;padding:6px 0 6px 16px;font-weight:700;font-size:.9rem;color:var(--blush-deep);white-space:nowrap}
+.coupon.used{opacity:.75}
+.coupon.used .redeem{color:var(--ink-soft);cursor:default}
+.coupon.used .redeem{visibility:hidden}
+.used-stamp{position:absolute;right:16px;top:50%;transform:translateY(-50%) rotate(-12deg);border:2px solid var(--blush-deep);color:var(--blush-deep);
+  border-radius:4px;padding:0 8px;font-weight:700;font-size:.85rem;pointer-events:none}
+.note-small{font-size:.9rem;color:var(--ink-soft);margin-top:14px}
+
+footer{text-align:center;color:var(--ink-soft);font-family:var(--hand);font-size:1.15rem}
+
+@media (max-width:440px){
+  .jar-area{grid-template-columns:1fr;justify-items:center}
+  .jar{max-width:150px}
+  .slip-zone{width:100%}
+  .letter{padding:28px 20px 32px;font-size:1.1rem}
+}
+@media (prefers-reduced-motion:reduce){*,*::before{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <filter id="crayon" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="3" result="warp"/>
+      <feDisplacementMap in="SourceGraphic" in2="warp" scale="5" xChannelSelector="R" yChannelSelector="G" result="wobbly"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="1" seed="8" result="grain"/>
+      <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.2 1.95" result="grainA"/>
+      <feComposite in="wobbly" in2="grainA" operator="in"/>
+    </filter>
+  </defs>
+</svg>
+
+<main class="wrap">
+
+  <section class="mail" aria-label="จดหมายถึง Pooh">
+    <div class="envelope" id="envelope">
+      <div class="env-back"></div>
+      <svg class="env-lines" viewBox="0 0 300 200" preserveAspectRatio="none" aria-hidden="true" filter="url(#crayon)">
+        <path class="crayon-line" d="M6 8 Q4 100 7 193 Q150 196 294 192 Q297 100 293 7 Q150 4 6 8Z"/>
+        <path class="crayon-line" d="M8 190 Q80 140 150 108 M292 190 Q220 142 151 106"/>
+      </svg>
+      <div class="flap"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" filter="url(#crayon)">
+        <path d="M1 1 L50 98 L99 1Z" fill="var(--sheet)"/>
+        <path class="crayon-line" d="M2 2 Q26 50 50 97 Q74 50 98 2"/>
+      </svg></div>
+      <div class="address">
+        <div class="from">form wawa to</div>
+        <div class="to">Pooh</div>
+      </div>
+      <button class="seal" id="seal" aria-label="เปิดจดหมาย">W</button>
+    </div>
+    <p class="hint" id="hint">กดตรง W สีชมพูน้าาาา</p>
+  </section>
+
+  <article class="letter" id="letter" hidden>
+    <p>Pooh</p>
+    <p>หวัดดีจ้า ครือไม่มีไรทำ รันAIก็ไม่ได้ เอาไฟล์อะไรก็ไม่ได้เลย เบื่อมากเลยนั่งทำจดหมายให้แฟนดีกว่า <3</p>
+    <p>ขอบคุณที่วันนี้เบบี้อุส่าขับเอาพอตมาให้เค้าน้าคับบบบ ถ้าไม่มีเบบี้ไม่รู้ชีวิตนี้เค้าจะอยู่ยังไง ขอขาดใจตายดีกว่า ขอบคุณที่ไม่งุงิใส่เค้าถึงเค้าจะแอบงุงิใส่เทอก็เถอะ แหะๆ</p>
+    <p>ชั้นน่ะรักเทอที่สุดเลย เธอมันก็เหมือนคดีที่ยากสุดๆ มีแต่ความรู้สึกที่เยอะแยะไปหมด ถึงฉันจะเป็นโฮล์มก็เถอะฉันก็คงจะไขคดีนี้ไม่ได้หรอก คงไม่มีใครไขหัวใจของคนรักได้อย่างถูกต้องหรอกน่า!</p>
+    <p>PS. เปิดอันล่างต่อได้เยยยย</p>
+    <p class="sign">รักคุณแฟน<br>Wawa</p>
+  </article>
+
+  <section aria-labelledby="jar-h">
+    <div class="section-head">
+      <h2 id="jar-h">A jar of little notes</h2>
+    </div>
+    <div class="jar-area">
+      <button class="jar" id="jar" aria-label="หยิบโน้ตจากโหล">
+        <svg viewBox="0 0 160 200" aria-hidden="true" overflow="visible">
+          <g filter="url(#crayon)">
+          <g class="lid"><rect x="38" y="6" width="84" height="22" rx="5" fill="var(--blush)" stroke="#C06C86" stroke-width="3"/>
+          <rect x="38" y="20" width="84" height="5" fill="#000" opacity=".08"/></g>
+          <path d="M44 30 h72 v12 c18 8 28 22 28 44 v84 c0 14 -10 24 -24 24 h-80 c-14 0 -24 -10 -24 -24 v-84 c0 -22 10 -36 28 -44z"
+            fill="var(--sheet)" fill-opacity=".55" stroke="var(--ink-soft)" stroke-width="3.5" stroke-linejoin="round"/>
+          <g id="slips"></g>
+          <path d="M34 80 c-4 20 -4 60 0 90" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".6" fill="none"/>
+          </g>
+        </svg>
+      </button>
+      <div class="slip-zone">
+        <div class="slip empty" id="slip" aria-live="polite">โน้ตจะโผล่มาตรงนี้</div>
+        <button class="btn" id="take">หยิบโน้ต</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>made for khun fan, with love from wawa ♡</footer>
+</main>
+
+<script>
+(function(){
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const store = {
+    get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+    set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+  };
+
+  /* Envelope */
+  const env=document.getElementById('envelope'), seal=document.getElementById('seal'),
+        letter=document.getElementById('letter');
+  let busy=false;
+  function openLetter(){
+    if(busy||env.classList.contains('open'))return; busy=true;
+    env.classList.add('open');
+    setTimeout(()=>{letter.classList.remove('fold');letter.hidden=false;letter.classList.add('reveal');
+      letter.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});busy=false}, reduce?0:650);
+  }
+  function closeLetter(){
+    if(busy||!env.classList.contains('open'))return; busy=true;
+    env.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});
+    letter.classList.remove('reveal');letter.classList.add('fold');
+    setTimeout(()=>{letter.hidden=true;letter.classList.remove('fold');
+      env.classList.remove('open');busy=false;seal.focus({preventScroll:true})}, reduce?0:600);
+  }
+  seal.addEventListener('click',e=>{e.stopPropagation();openLetter()});
+  env.addEventListener('click',()=>{ if(env.classList.contains('open')) closeLetter(); });
+
+
+  /* Jar */
+  const notes=[
+    "เทอทำให้วันธรรมดาของเค้าน่าอยู่ขึ้นนะ",
+    "บังเอิญเจอ แต่ตั้งใจรักนะครับ 🫶🏻",
+    "เค้าชอบจับมืออุ่นๆของเบบี้ที่สุดในโลกกก!!!",
+    "เบบี้ชอบเรียกเค้าว่าคนเก่ง แต่จริงๆเบบี้ก็เก่งที่สุดสำหรับเค้าเหมือนกันนะะะ🤏🏻",
+    "ขอให้เจอแมวน่ารักในวันจันทร์ที่ฝนตก",
+    "ขอให้เจอเหรียญบาทตอนกำลังหาเงินให้ครบ10บาทพอดี",
+    "ขอให้ร้านทำข้าวอร่อยสุดๆในวันที่เบบี้โมโหหิวมากๆๆๆๆ",
+    "ขอให้เบบี้ไม่แฮ้งหลังจากกินเหล้า ในวันต่อไปที่มีงานตอนเช้า",
+    "ขอให้เดือนนี้ใจดีกับเราทั้งคู่",
+    "ขอให้หาของเจอไวๆในวันที่เราทั้งคู่รีบๆในตอนเช้า",
+    "ขอให้เบบี้หาปั้มน้ำมันเจอพอดีตอนที่น้ำมันกำลังจะหมด",
+    "ขอให้หาหัวพอตสำรองเจอตอนที่หัวหมดพอดี",
+    "there's something beautiful about waking up knowing someone like you is in my life"
+  ];
+  const LAST=notes.length-1; // ข้อความสุดท้าย (ภาษาอังกฤษ) จะขึ้นเป็นแผ่นสุดท้ายทุกรอบ
+  const palette=['#F3E3A4','#E8A0B4','#B9CBEF','#CDE8D2','#F6C9A8'];
+  let seen=store.get('pooh-seen',[]).filter(i=>i<notes.length);
+  const slipsG=document.getElementById('slips'), slip=document.getElementById('slip'),
+        take=document.getElementById('take');
+  // กองโน้ตยุ่ง ๆ ในโหล: สุ่มตำแหน่งแบบคงที่ (seed) ให้หน้าตาเหมือนเดิมทุกครั้งที่เปิด
+  const PILE=(()=>{
+    let s=7; const rnd=()=>{s=(s*16807)%2147483647;return (s-1)/2147483646};
+    const out=[];
+    for(let i=0;i<46;i++){
+      const w=18+rnd()*10, hgt=10+rnd()*6;
+      const y=74+rnd()*108;                    // ตั้งแต่ใต้คอโหลถึงก้นโหล
+      const x=30+rnd()*(100-w);
+      const r=Math.round(rnd()*140-70);
+      out.push({x,y,w,hgt,r,c:palette[Math.floor(rnd()*palette.length)]});
+    }
+    return out.sort((a,b)=>b.y-a.y);           // ก้นโหลก่อน แผ่นบน ๆ หายก่อนตอนหยิบ
+  })();
+  function drawSlips(){
+    const left=notes.length-seen.length; slipsG.innerHTML='';
+    const show=left?Math.max(3,Math.round(PILE.length*left/notes.length)):0;
+    PILE.slice(0,show).forEach(p=>{
+      slipsG.insertAdjacentHTML('beforeend',`<rect x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" width="${p.w.toFixed(1)}" height="${p.hgt.toFixed(1)}" rx="2" fill="${p.c}" stroke="rgba(0,0,0,.12)" stroke-width=".8" transform="rotate(${p.r} ${(p.x+p.w/2).toFixed(1)} ${(p.y+p.hgt/2).toFixed(1)})"/>`);
+    });
+    take.textContent = left ? 'หยิบโน้ต' : 'เติมโหลใหม่';
+  }
+
+  function pull(){
+    let left=notes.map((_,i)=>i).filter(i=>!seen.includes(i));
+    if(!left.length){seen=[];store.set('pooh-seen',seen);slip.className='slip empty';slip.textContent='เติมแล้ว หยิบใหม่ได้เลย';drawSlips();return}
+    const pool=left.length>1?left.filter(i=>i!==LAST):left;
+    const pick=pool[Math.floor(Math.random()*pool.length)];
+    seen.push(pick);store.set('pooh-seen',seen);
+    slip.className='slip';void slip.offsetWidth;slip.classList.add('pop');
+    slip.style.background=palette[pick%5];
+    slip.textContent=notes[pick];
+    drawSlips();
+  }
+  take.addEventListener('click',pull);
+  document.getElementById('jar').addEventListener('click',pull);
+  drawSlips();
+})();
+</script>
+
+</body>
+</html>
